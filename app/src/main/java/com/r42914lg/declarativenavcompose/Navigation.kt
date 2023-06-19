@@ -2,9 +2,7 @@ package com.r42914lg.declarativenavcompose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,7 +39,7 @@ fun MyAppNavHost(
 
 const val screenARoute = "screen_A"
 
-fun NavGraphBuilder.screenANavGraphBuilder(onClick: () -> Unit, onBack: () -> Unit) {
+fun NavGraphBuilder.screenANavGraphBuilder(onClick: (Int, String) -> Unit, onBack: () -> Unit) {
     composable(screenARoute) {
         ScreenA(
             onClick = onClick,
@@ -50,8 +48,8 @@ fun NavGraphBuilder.screenANavGraphBuilder(onClick: () -> Unit, onBack: () -> Un
     }
 }
 
-fun NavController.navigateToB() {
-    navigate(screenBRoute)
+fun NavController.navigateToA() {
+    navigate(screenARoute)
 }
 
 /**
@@ -59,18 +57,34 @@ fun NavController.navigateToB() {
  */
 
 const val screenBRoute = "screen_B"
+const val someMandatoryArg = "arg_1"
+const val someOptionalArg = "arg_2"
 
 fun NavGraphBuilder.screenBNavGraphBuilder(onClick: () -> Unit, onBack: () -> Unit) {
-    composable(screenBRoute) {
+    composable(
+        route = "$screenBRoute/{$someMandatoryArg}?$someOptionalArg={$someOptionalArg}",
+        arguments = listOf(
+            navArgument(someMandatoryArg) { type = NavType.IntType },
+            navArgument(someOptionalArg) {
+                type = NavType.StringType
+                nullable = false
+                defaultValue = "some default value"
+            }
+        )
+    ) {
+        val mandatoryArg = it.arguments?.getInt(someMandatoryArg) ?: throw IllegalStateException()
+        val optionalArg = it.arguments?.getString(someOptionalArg).orEmpty()
         ScreenB(
             onClick = onClick,
             onClickBack = onBack,
+            arg1 = mandatoryArg,
+            arg2 = optionalArg,
         )
     }
 }
 
-fun NavController.navigateToA() {
-    navigate(screenARoute)
+fun NavController.navigateToB(mandatoryArgVal: Int, optionalArgVal: String) {
+    navigate("$screenBRoute/$mandatoryArgVal?$someOptionalArg=${optionalArgVal}")
 }
 
 /**

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ScreenA(
-    onClick: () -> Unit,
+    onClick: (Int, String) -> Unit,
     onClickBack: () -> Unit,
 ) {
     BackHandler {
@@ -40,7 +41,7 @@ fun ScreenA(
     Text(
         text = "Click to B Screen",
         modifier = Modifier.clickable {
-            onClick()
+            onClick(99, "buda-bum")
         }
     )
 }
@@ -49,16 +50,26 @@ fun ScreenA(
 fun ScreenB(
     onClick: () -> Unit,
     onClickBack: () -> Unit,
+    arg1: Int,
+    arg2: String,
 ) {
     BackHandler {
         onClickBack()
     }
-    Text(
-        text = "Click to C Screen",
-        modifier = Modifier.clickable {
-            onClick()
-        }
-    )
+    Column{
+        Text(
+            text = "Mandatory arg is $arg1, optional - $arg2",
+            modifier = Modifier.clickable {
+                onClick()
+            }
+        )
+        Text(
+            text = "Click to C Screen",
+            modifier = Modifier.clickable {
+                onClick()
+            }
+        )
+    }
 }
 
 @Composable
